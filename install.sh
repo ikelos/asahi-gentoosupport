@@ -119,7 +119,7 @@ make_genkernel() {
         # Change genkernel parameters
         sed -i -e 's/#MRPROPER="yes"/MRPROPER="no"/' \
                 -e 's/#CLEAN="yes"/CLEAN="no"/' \
-                -e 's/#CMD_CALLBACK=""/CMD_CALLBACK="m1n1-update"' \
+                -e 's/#CMD_CALLBACK=""/CMD_CALLBACK="m1n1-update"/' \
                 /etc/genkernel.conf
 
         genkernel all
@@ -186,9 +186,9 @@ merge_kernel_sources
 
 # make_kernel
 
-make_genkernel
-
 install_m1n1
+
+make_genkernel
 
 install_fw
 
