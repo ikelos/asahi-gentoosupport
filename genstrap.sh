@@ -42,7 +42,7 @@ bsdtar -xf install.iso --include image.squashfs
 echo "Creating temporary mount..."
 echo
 mkdir /mnt/temp
-modprobe brd rd_nr=1 rd_size=923600
+modprobe brd rd_nr=1 rd_size=1023600
 
 parted -sf /dev/ram0 mklabel gpt
 parted -sf /dev/ram0 "mkpart root 0 -1"
