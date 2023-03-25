@@ -96,8 +96,35 @@ make_kernel() {
                 /boot/initramfs-${KERNVER}.img
         
         # We need to rebuild GRUB
-        grub-install --removable --efi-directory=/boot/efi --boot-directory=/boot
-        grub-mkconfig -o /boot/grub/grub.cfg
+        #grub-install --removable --efi-directory=/boot/efi --boot-directory=/boot
+        #grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+make_genkernel() {
+	echo "We are going to install a known-good kernel for you now.  You"
+        echo "can edit this at any time after the install procedure has finished."
+        echo "In fact, you should edit it once you've booted in to the filesystem."
+        echo
+        read -sp "Press Enter to continue..."
+        echo
+        # Check if genkernel is installed
+	if [[ ! -f /usr/bin/genkernel ]]; then
+		emerge -qv genkernel
+	fi
+
+        echo "sys-apps/kmod zstd" >> /etc/portage/package.use/kernel
+        emerge -qv kmod
+        zcat /proc/config.gz > /usr/src/linux/.config
+
+        # Change genkernel parameters
+        sed -i -e 's/#MRPROPER="yes"/MRPROPER="no"/' \
+                -e 's/#CLEAN="yes"/CLEAN="no"/' \
+                -e 's/#CMD_CALLBACK=""/CMD_CALLBACK="m1n1-update"' \
+                /etc/genkernel.conf
+
+        genkernel all
+
+
 }
 
 
@@ -128,10 +155,10 @@ if [[ $(whoami) != "root" ]]; then
         exit 1
 fi
 
-if [[ ! -d /boot/efi/vendorfw ]]; then
-        echo "You must mount the Asahi EFI System Partition to /boot/efi."
+if [[ ! -d /boot/vendorfw ]]; then
+        echo "You must mount the Asahi EFI System Partition to /boot."
         echo "This is absolutely necessary for the proper functioning of the"
-        echo "system. Please mount the ESP at /boot/efi and add it to your"
+        echo "system. Please mount the ESP at /boot and add it to your"
         echo "fstab before continuing."
         exit 1
 fi
@@ -139,7 +166,7 @@ fi
 
 echo "This script automates the setup and configuration of Apple Silicon"
 echo "specific tooling. Please ensure that /boot is mounted where you want, and"
-echo "the Asahi EFI System Partition is mounted to /boot/efi."
+echo "the Asahi EFI System Partition is mounted to /boot."
 echo
 echo "NOTE: This script will install linux-firmware automatically. It is not"
 echo "possible to run these machines properly without binary blobs. Please make"
@@ -153,11 +180,13 @@ install_overlay
 
 install_uboot
 
-install_grub
+# install_grub
 
 merge_kernel_sources
 
-make_kernel
+# make_kernel
+
+make_genkernel
 
 install_m1n1
 
