@@ -9,7 +9,8 @@ install_overlay() {
         echo "Installing the Asahi Overlay. For more information, visit"
         echo "https://github.com/chadmed/asahi-overlay/"
         echo
-
+	
+        mkdir -p /etc/portage/repos.conf
         cp resources/repo.conf /etc/portage/repos.conf/asahi.conf
         emaint sync -r asahi
         echo "The Asahi overlay has been installed."
