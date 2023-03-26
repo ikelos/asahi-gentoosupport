@@ -36,8 +36,8 @@ install_grub() {
 install_m1n1() {
         echo "Installing m1n1."
         emerge -qv m1n1
-        update-m1n1
-        echo "m1n1 has been installed."
+        # update-m1n1
+        echo "m1n1 has been installed as a package, but will be updated as part of the genkernel run."
 }
 
 
