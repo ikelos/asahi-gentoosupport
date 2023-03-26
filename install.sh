@@ -29,6 +29,7 @@ install_grub() {
         echo "GRUB_PLATFORMS=\"efi-64\"" >> /etc/portage/make.conf
         emerge -q grub:2
         echo "GRUB has been installed."
+        grub-install --efi-directory=/boot --no-nvram --removable
 }
 
 
@@ -101,16 +102,12 @@ make_kernel() {
         #grub-mkconfig -o /boot/grub/grub.cfg
 }
 
-make_dtbs() {
-	cd /usr/src/linux
-	make dtbs
-}
-
 make_genkernel() {
 	echo "We are going to install a known-good kernel for you now.  You"
         echo "can edit this at any time after the install procedure has finished."
         echo "In fact, you should edit it once you've booted in to the filesystem."
         echo
+        echo "YOU MUST ADD SATA_ACHI_PLATFORM=y"
         read -sp "Press Enter to continue..."
         echo
         # Check if genkernel is installed
@@ -122,10 +119,14 @@ make_genkernel() {
         emerge -qv kmod
         zcat /proc/config.gz > /usr/src/linux/.config
 
+	cd /usr/src/linux
+	make dtbs
+
         # Change genkernel parameters
         sed -i -e 's/#MRPROPER="yes"/MRPROPER="no"/' \
                 -e 's/#CLEAN="yes"/CLEAN="no"/' \
                 -e 's/#CMD_CALLBACK=""/CMD_CALLBACK="make dtbs; update-m1n1"/' \
+                -e 's/#BOOTLOADER="no"/BOOTLOADER="grub"/' \
                 /etc/genkernel.conf
 
         genkernel all
@@ -186,11 +187,9 @@ install_overlay
 
 install_uboot
 
-# install_grub
+install_grub
 
 merge_kernel_sources
-
-make_dtbs
 
 # make_kernel
 
@@ -203,3 +202,5 @@ install_fw
 echo "This script will now exit. Continue setting up your machine as per the"
 echo "Gentoo Handbook, skipping the steps related to setting up the kernel or"
 echo "GRUB as these have been done for you."
+echo 
+echo "Now set a root password, and emerge tools (dhcpcd, e2fsprogs, dosfstools, etc)"
