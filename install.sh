@@ -117,7 +117,9 @@ make_genkernel() {
 
         echo "sys-apps/kmod zstd" >> /etc/portage/package.use/kernel
         emerge -qv kmod
-        zcat /proc/config.gz > /usr/src/linux/.config
+	if [[ ! -f /usr/src/linux/.config ]]; then
+                zcat /proc/config.gz > /usr/src/linux/.config
+        fi
 
 	cd /usr/src/linux
 	make dtbs
