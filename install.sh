@@ -101,6 +101,11 @@ make_kernel() {
         #grub-mkconfig -o /boot/grub/grub.cfg
 }
 
+make_dtbs() {
+	cd /usr/src/linux
+	make dtbs
+}
+
 make_genkernel() {
 	echo "We are going to install a known-good kernel for you now.  You"
         echo "can edit this at any time after the install procedure has finished."
@@ -120,7 +125,7 @@ make_genkernel() {
         # Change genkernel parameters
         sed -i -e 's/#MRPROPER="yes"/MRPROPER="no"/' \
                 -e 's/#CLEAN="yes"/CLEAN="no"/' \
-                -e 's/#CMD_CALLBACK=""/CMD_CALLBACK="update-m1n1"/' \
+                -e 's/#CMD_CALLBACK=""/CMD_CALLBACK="make dtbs; update-m1n1"/' \
                 /etc/genkernel.conf
 
         genkernel all
@@ -184,6 +189,8 @@ install_uboot
 # install_grub
 
 merge_kernel_sources
+
+make_dtbs
 
 # make_kernel
 
