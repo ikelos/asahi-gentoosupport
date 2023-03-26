@@ -128,8 +128,10 @@ make_genkernel() {
         sed -i -e 's/#MRPROPER="yes"/MRPROPER="no"/' \
                 -e 's/#CLEAN="yes"/CLEAN="no"/' \
                 -e 's/#CMD_CALLBACK=""/CMD_CALLBACK="make dtbs; update-m1n1"/' \
-                -e 's/#BOOTLOADER="no"/BOOTLOADER="grub"/' \
+                -e 's/#BOOTLOADER="no"/BOOTLOADER="grub2"/' \
                 /etc/genkernel.conf
+
+        touch /boot/grub/grub.cfg
 
         genkernel all
 
